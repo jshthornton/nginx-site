@@ -51,11 +51,11 @@ server {
   # Includes
   <% @includes.each do |file_include| %>
   include <%= file_include %>
-  <% end %>
+  <% end unless @includes.nil? %>
 
   <% @partials.each do |partial| %>
   <%= render partial %>
-  <% end %>
+  <% end unless @partials.nil? %>
 }
 <% else %>
 server {
@@ -95,10 +95,10 @@ server {
   # Includes
   <% @includes.each do |file_include| %>
   include <%= file_include %>
-  <% end %>
+  <% end unless @includes.nil? %>
 
   <% @partials.each do |partial| %>
   <%= render partial %>
-  <% end %>
+  <% end unless @partials.nil? %>
 }
 <% end %>
