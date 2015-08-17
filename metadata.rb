@@ -1,0 +1,5 @@
+name "nginxsite"
+description "Configure nginx with sites"
+maintainer "Joshua Thornton"
+license "MIT"
+version "1.0.0"

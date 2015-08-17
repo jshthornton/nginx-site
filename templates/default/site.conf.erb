@@ -1,0 +1,104 @@
+<% if @application[:ssl_support] %>
+server {
+  listen [::]:80;
+  listen 80;
+
+  # listen on both hosts
+  server_name <%= @application[:domains].join(" ") %>;
+
+  # and redirect to the https host (declared below)
+  # avoiding http://www -> https://www -> https:// chain.
+  return 301 https://example.com$request_uri;
+}
+
+server {
+  listen [::]:443 ssl spdy;
+  listen 443 ssl spdy;
+
+  <% if @application[:www_prefix] %>
+
+  <% else %>
+
+  <% end %>
+
+  # listen on the wrong host
+  server_name www.example.com;
+
+  # and redirect to the non-www host (declared below)
+  return 301 https://example.com$request_uri;
+}
+
+server {
+  # listen [::]:443 ssl spdy accept_filter=dataready;  # for FreeBSD
+  # listen 443 ssl spdy accept_filter=dataready;  # for FreeBSD
+  # listen [::]:443 ssl spdy deferred;  # for Linux
+  # listen 443 ssl spdy deferred;  # for Linux
+  listen [::]:443 ssl spdy;
+  listen 443 ssl spdy;
+
+  # The host name to respond to
+  server_name <%= @application[:domains].join(" ") %>
+
+  # Path for static files
+  root <%= @application[:absolute_document_root] %>;
+
+  #Specify a charset
+  charset utf-8;
+
+  # Custom 404 page
+  error_page 404 /404.html;
+
+  # Includes
+  <% @includes.each do |file_include| %>
+  include <%= file_include %>
+  <% end %>
+
+  <% @partials.each do |partial| %>
+  <%= render partial %>
+  <% end %>
+}
+<% else %>
+server {
+  # don't forget to tell on which port this server listens
+  listen [::]:80;
+  listen 80;
+
+  <% if @application[:www_prefix] %>
+  server_name ~^(?<domain>.+)$;
+  return 301 $scheme://www.$domain$request_uri;
+  <% else %>
+  server_name ~^(www\.)?(?<domain>.+)$;
+  return 301 $scheme://$domain$request_uri;
+  <% end %>
+}
+
+server {
+  # listen [::]:80 accept_filter=httpready; # for FreeBSD
+  # listen 80 accept_filter=httpready; # for FreeBSD
+  # listen [::]:80 deferred; # for Linux
+  # listen 80 deferred; # for Linux
+  listen [::]:80;
+  listen 80;
+
+  # The host name to respond to
+  server_name <%= @application[:domains].join(" ") %>;
+
+  # Path for static files
+  root <%= @application[:absolute_document_root] %>;
+
+  #Specify a charset
+  charset utf-8;
+
+  # Custom 404 page
+  error_page 404 /404.html;
+
+  # Includes
+  <% @includes.each do |file_include| %>
+  include <%= file_include %>
+  <% end %>
+
+  <% @partials.each do |partial| %>
+  <%= render partial %>
+  <% end %>
+}
+<% end %>
