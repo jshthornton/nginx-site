@@ -99,8 +99,10 @@ server {
 
   <% @partials.each do |partial| %>
   <% if partial.is_a?(String) then %>
+  <% Chef::Log.debug("Rendering nginx site partial #{partial}") -%>
   <%= render partial %>
   <% else %>
+  <% Chef::Log.debug("Rendering nginx site partial #{partial[0]}") -%>
   <%= render partial[0], partial[1] %>
   <% end %>
   <% end unless @partials.nil? %>
