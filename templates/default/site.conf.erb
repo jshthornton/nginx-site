@@ -98,7 +98,11 @@ server {
   <% end unless @includes.nil? %>
 
   <% @partials.each do |partial| %>
+  <% if partial.is_a?(String) then %>
   <%= render partial %>
+  <% else %>
+  <%= render partial[0], partial[1] %>
+  <% end %>
   <% end unless @partials.nil? %>
 }
 <% end %>
